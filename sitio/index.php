@@ -230,7 +230,7 @@ $descripcion .= ' esperando que colabore con el conocimiento y el cuidado de nue
     </div>
 
     <?php require_once('custom/scripts/modals.php') ?>
-    <script type="text/javascript" src="<?php echo $APP_URL; ?>/custom/scripts/interaccion-form-mapa.min.js"></script>
+    <script type="text/javascript" src="<?php echo $APP_URL; ?>/custom/scripts/interaccion-form-mapa.js"></script>
     <?php require_once('custom/scripts/pintar-mapa.php') ?>
     <?php require_once('custom/scripts/funciones-js-footer.php') ?>
   </body>

@@ -25,64 +25,7 @@
             <i class="fa fa-trash-o"></i>
           </a>
         </h3>
-        <select class="form-control input-lg selectpicker" data-style="btn-default" name="especie_id" id="especie_id" data-live-search="true">
-          <option value="0">Todas</option>
-          <?php
-          // Consulto especies y cantidad
-          $especies_query = "SELECT
-            e.id as especie_id, e.nombre_cientifico, e.nombre_comun
-            FROM t_registros i, t_especies AS e
-            WHERE i.especie_id = e.id
-            GROUP BY e.id
-            ORDER BY e.nombre_cientifico";
-
-          $especies_results  = GetRS($especies_query);
-
-          // Armo el array con los individuos
-          while ($especies_row = mysqli_fetch_array($especies_results)) {
-            if (isset($i)) {
-              $i++;
-            } else {
-              $i = 1;
-            }
-
-              $lista_NCIE    = $especies_row['nombre_cientifico'];
-              $lista_NCOM    = $especies_row['nombre_comun'];
-              $lista_ID    = $especies_row['especie_id'];
-              //$lista_CANT    = $especies_row['CANT'];
-            $selected = '';
-            if ($especie_id_busqueda===$lista_ID) {
-              $selected = ' selected';
-
-              // Me guardo la variable para cambiar la URL
-              $especie_URL = sanear_string($lista_NCIE);
-              $especie_URL = strtolower(str_replace(" ", "-", $especie_URL));
-              $especie_URL = "./" . $especie_URL;
-            }
-
-            // ver especie ID
-            if (isset($_SESSION["ver_especie_id"])) {
-              $voluntario_especie_id = $lista_ID . " - ";
-            }
-
-            echo '<option value="'.$lista_ID.'" '.$selected.' data-content="
-                <div>';
-
-            if (isset($voluntario_especie_id)) {
-              echo $voluntario_especie_id;
-            }
-
-            echo $lista_NCIE .
-                  '<small class=\'muted text-muted\'> '
-                    . $lista_NCOM.
-                  '</small>
-                </div>
-              ">'
-              . $lista_NCIE .
-              '</option>
-            ';
-          }
-          ?>
+        <select class="form-control input-lg" data-style="btn-default" name="especie_id" id="especie_id" data-live-search="true" data-current="<?php echo $especie_id_busqueda ?>">
         </select>
       </div>
     </div>
