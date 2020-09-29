@@ -9,11 +9,12 @@
             en todo el mapa
           </label>
           <label>
-            <input type="radio" id="rdonde-mapa" name="rdonde" value="<? echo $user_latlng_default[0].' '.$user_latlng_default[1] ?>" <?php echo (stripos($busqueda, 'marker') > 0) ? 'checked' : '' ?>>
+            <input type="radio" id="rdonde-mapa" name="rdonde" value="<?php echo $user_latlng_default[0].' '.$user_latlng_default[1] ?>" <?php echo (stripos($busqueda, 'marker') > 0) ? 'checked' : '' ?>>
             marcar en el mapa
           </label>
         </div>
         <input type="hidden" value="<?php echo (isset($user_lat) && isset($user_lng)) ? $user_lat.' '.$user_lng : '' ?>" name="user_latlng" id="user_latlng">
+        <input type="hidden" name="radio" value="<?php echo $radius ?>">
       </div>
     </div>
 
@@ -26,6 +27,7 @@
           </a>
         </h3>
         <select class="form-control input-lg" data-style="btn-default" name="especie_id" id="especie_id" data-live-search="true" data-current="<?php echo $especie_id_busqueda ?>">
+          <!-- Options loaded via ajax -->
         </select>
       </div>
     </div>

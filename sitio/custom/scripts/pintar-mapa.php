@@ -16,21 +16,15 @@
     bodyWidth = $("section[data-role='main']").width();
     $("#mapa").css("width", bodyWidth); //set with CSS also...
 
-    var map = L.map('mapa',
-    {
-      maxZoom: 21,
-      minZoom: 5
-    })<?php echo ((empty($busqueda)) || ((isset($total_registros_censo)) && ($total_registros_censo == 0))) ? '.setView([-34.618, -58.44], 12);' : ';'?>
+    var map = L.map('mapa', { maxZoom: 21, minZoom: 5 }).setView([-34.618, -58.44], 12);
 
     // MAPA
     L.tileLayer(
       'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw',
       {
         maxZoom: 21,
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-          '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-          'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-        id: 'mapbox.streets'
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        id: 'mapbox.streets',
       }
     ).addTo(map);
 
@@ -43,8 +37,8 @@
         onClick: function(btn, map) {
           $('#agregar-arbol').find('.modal-content').css('min-width', '550px');
           $('#agregar-arbol').modal('show');
-        }
-      }]
+        },
+      }],
     });
     agregarArbol.addTo(map);
 
@@ -76,7 +70,6 @@
       var bboxcenter = result.center;
       muestraPorAca(bboxcenter.lat, bboxcenter.lng, map, true)
     };
-
 
     // COPY
     map.attributionControl.addAttribution(
@@ -164,106 +157,6 @@
         muestraPorAca(chagedPos.lat, chagedPos.lng, map);
       });
     }
-
-    <?php
-
-    if ((!empty($busqueda)) && ((isset($total_registros_censo)) && ($total_registros_censo >= 1))) : ?>
-      var progress = $('.progress');
-      var progressBar = $('.progress-bar');
-
-      function updateProgressBar(processed, total, elapsed, layersArray) {
-        if (elapsed > 1000) {
-          // Si toma más de un segundo en cargar, se muestra la barra de progreso.
-          $('.progress').slideDown('slow');
-          porcentaje = Math.round(processed/total*100) + '%';
-          $('.progress-bar').css({'width':porcentaje})
-        }
-
-        if (processed === total) {
-          // Todos los markers cargados, oculto la barra.
-          $('.progress').slideUp('slow');
-        }
-      }
-
-      // Propiedades de clustering
-
-      var markers = L.markerClusterGroup({
-        chunkedLoading: true,
-        chunkProgress: updateProgressBar,
-        showCoverageOnHover: true,
-        zoomToBoundsOnClick: true,
-        spiderfyDistanceMultiplier: 2,
-        maxClusterRadius: 100, // en pixeles
-        disableClusteringAtZoom: <?php echo $disableClusteringAtZoom ?>,
-        polygonOptions: {
-          fillColor: '#5cba9d',
-          color: '#5cba9d',
-          weight: 1,
-          opacity: 1,
-          fillOpacity: 0.1
-         }
-      });
-
-      var markerList = [];
-
-      // Propiedades de los markers
-      var LeafIcon  = L.Icon.extend({
-        options: {
-          iconSize:     [30, 34],
-          iconAnchor:   [15, 31],
-          popupAnchor:  [1, -20]
-        }
-      });
-
-      // Iconos customizados por especie (algunas tienen)
-      var arboles = [<?php echo $arboles_para_mapa; ?>];
-
-      for (var i = 0; i < arboles.length; i++) {
-        var a = arboles[i];
-        var content = 'cargando...';
-        var marker_icon = new LeafIcon({iconUrl: '<?php echo $APP_URL; ?>/uploads/'+a[3]});
-        //var arbol = L.marker([a[0], a[1]], {icon: marker_icon})
-        var arbol = L.marker([a[0], a[1]], {icon: marker_icon}).on('click', onMarkerClick);
-
-        // Paso al arbol la propiedad de ID para hacer búsquedas dentro del popup.
-        arbol.arbolId = a[2];
-        markerList.push(arbol);
-      }
-
-      // Todos los markers a un layer
-      markers.addLayers(markerList);
-      // Agrego el layer al mapa
-      map.addLayer(markers);
-      // Centro el mapa.
-      map.fitBounds(markers.getBounds());
-
-      function onMarkerClick(e) {
-        var oMarkerId = this.arbolId;
-
-        $.ajax({
-          url: "<?php echo $APP_URL; ?>/custom/scripts/arbol.php?id="+oMarkerId,
-          success: function(datos){
-            $('#info-arbol').html(datos);
-            $('#info-arbol').slideDown();
-            //window.location.href = '#info-arbol';
-            //oPop.setContent(datos);
-            //oPop.update();
-            $('.cerrar').click(function (e) {
-              e.preventDefault();
-              $('#info-arbol').slideUp();
-            })
-
-          }
-        });
-      }
-
-    <?php endif; // FIN búsqueda <> VACIA ?>
-
-    <?php // Si la búsqueda incluye posición, marco el círculo con el marker de esa posición.
-    if (stripos($busqueda, 'donde marker') > 0) {
-      echo "onLocationFound(this.event,'". $user_lat ."','". $user_lng ."');";
-    }
-    ?>
 
     // Creo una variable dentro de window para poder llamar a map desde funciones externas.
     window.map = map;

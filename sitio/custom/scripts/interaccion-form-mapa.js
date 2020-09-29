@@ -11,6 +11,94 @@
   $('input#respecies-todas').prop('checked', true);
 }*/
 
+var markers = L.markerClusterGroup({
+  chunkedLoading: true,
+  chunkProgress: updateProgressBar,
+  showCoverageOnHover: true,
+  zoomToBoundsOnClick: true,
+  spiderfyDistanceMultiplier: 2,
+  maxClusterRadius: 100, // en pixeles
+  disableClusteringAtZoom: 21,
+  polygonOptions: {
+    fillColor: '#5cba9d',
+    color: '#5cba9d',
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.1
+   }
+});
+
+var markerList = [];
+
+var LeafIcon  = L.Icon.extend({
+  options: {
+    iconSize:     [30, 34],
+    iconAnchor:   [15, 31],
+    popupAnchor:  [1, -20]
+  }
+});
+
+function updateProgressBar(processed, total, elapsed, layersArray) {
+  if (elapsed > 1000) {
+    // Si toma más de un segundo en cargar, se muestra la barra de progreso.
+    $('.progress').slideDown('slow');
+    porcentaje = Math.round(processed/total*100) + '%';
+    $('.progress-bar').css({'width':porcentaje})
+  }
+
+  if (processed === total) {
+    // Todos los markers cargados, oculto la barra.
+    $('.progress').slideUp('slow');
+  }
+}
+
+function onMarkerClick(e) {
+  var oMarkerId = this.arbolId;
+
+  $.ajax({
+    url: '/custom/scripts/arbol.php?id=' + oMarkerId,
+    success: function(datos){
+      $('#info-arbol').html(datos);
+      $('#info-arbol').slideDown();
+      $('.cerrar').click(function (event) {
+        event.preventDefault();
+        $('#info-arbol').slideUp();
+      })
+
+    }
+  });
+}
+
+function getArboles() {
+  var $form = $('#busca_arboles');
+  $.ajax({
+    url: 'http://localhost:8080/arboles',
+    method: 'GET',
+    data: $form.serialize(),
+    success: function(arboles) {
+      $('#empieza-busqueda').modal('hide');
+      for (var arbol of arboles) {
+        var marker_icon = new LeafIcon({ iconUrl: '/uploads/' + arbol.icono });
+        var marker = L.marker([arbol.lat, arbol.lng], { icon: marker_icon }).on('click', onMarkerClick);
+        marker.arbolId = arbol.id;
+        markerList.push(marker);
+      }
+      markers.addLayers(markerList);
+      // Agrego el layer al mapa
+      window.map.addLayer(markers);
+      // Centro el mapa.
+      window.map.fitBounds(markers.getBounds());
+    },
+  });
+}
+
+$('#busca_arboles').on('submit', function(event) {
+  event.preventDefault();
+  if (validarBusqueda()) {
+    getArboles();
+  }
+});
+
 function getEspecies() {
   $.ajax({
     url: 'http://localhost:8080/especies',
@@ -67,7 +155,7 @@ function muestraPorAca(lat,lng,map,buscar) {
   if (buscar) {
     valida = validarBusqueda();
     if (valida) {
-      document.getElementById("busca_arboles").submit();
+      getArboles();
     } else {
       e.preventDefault();
     }
@@ -248,14 +336,14 @@ $(document).ready(function() {
     }
   });
 
-  $('form#busca_arboles').submit(function(e) {
-    valida = validarBusqueda();
-    if (valida) {
-      $('form#busca_arboles').submit();
-    }else{
-      e.preventDefault();
-    }
-  });
+  // $('form#busca_arboles').submit(function(e) {
+  //   valida = validarBusqueda();
+  //   if (valida) {
+  //     $('form#busca_arboles').submit();
+  //   }else{
+  //     e.preventDefault();
+  //   }
+  // });
 
   $("nav a.scroll").on('click', function(e) {
     e.preventDefault();
