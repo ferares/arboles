@@ -1,3 +1,145 @@
+<?php
+$radius = "1000"; // Radio de búsqueda en Metros
+$disableClusteringAtZoom = 21;
+$masFiltrosCss = 'oculto';
+
+$user_sabores = false;
+if (isset($_POST['user_sabores'])) {
+  $user_sabores = $_POST['user_sabores'];
+} elseif (isset($_GET['user_sabores'])) {
+  $user_sabores = $_GET['user_sabores'];
+}
+
+$user_origen = 'Todas';
+if (isset($_POST['user_origen'])) {
+  $user_origen = $_POST['user_origen'];
+} elseif (isset($_GET['user_origen'])) {
+  $user_origen = $_GET['user_origen'];
+}
+
+$borigen_pampeana = 0;
+if (isset($_POST['borigen_pampeana'])) {
+  $borigen_pampeana  = $_POST['borigen_pampeana'];
+} elseif (isset($_GET['borigen_pampeana'])) {
+  $borigen_pampeana  = $_GET['borigen_pampeana'];
+}
+
+$borigen_nea = 0;
+if (isset($_POST['borigen_nea'])) {
+  $borigen_nea  = $_POST['borigen_nea'];
+} elseif (isset($_GET['borigen_nea'])) {
+  $borigen_nea  = $_GET['borigen_nea'];
+}
+
+$borigen_noa = 0;
+if (isset($_POST['borigen_noa'])) {
+  $borigen_noa  = $_POST['borigen_noa'];
+} elseif (isset($_GET['borigen_noa'])) {
+  $borigen_noa  = $_GET['borigen_noa'];
+}
+
+$borigen_cuyana = 0;
+if (isset($_POST['borigen_cuyana'])) {
+  $borigen_cuyana  = $_POST['borigen_cuyana'];
+} elseif (isset($_GET['borigen_cuyana'])) {
+  $borigen_cuyana  = $_GET['borigen_cuyana'];
+}
+
+$borigen_patagonica = 0;
+if (isset($_POST['borigen_patagonica'])) {
+  $borigen_patagonica  = $_POST['borigen_patagonica'];
+} elseif (isset($_GET['borigen_patagonica'])) {
+  $borigen_patagonica  = $_GET['borigen_patagonica'];
+}
+
+$user_latlng_default = array("-34.60371794474704","-58.38157095015049"); // El Obelisco
+$user_latlng = null;
+if (isset($_POST['user_latlng'])) {
+  $user_latlng = $_POST['user_latlng']; // "lat lng"
+} elseif (isset($_GET['user_latlng'])) {
+  $user_latlng = $_GET['user_latlng'];
+}
+
+$especie_id_busqueda = '';
+if (isset($_POST['especie_id'])) {
+  $especie_id_busqueda = $_POST['especie_id'];
+} elseif (isset($_GET['especie_id'])) {
+  $especie_id_busqueda = $_GET['especie_id'];
+}
+
+$busqueda  = "";
+if (isset($_GET['colaborativo'])) {
+    $busqueda = "SQL custom";
+} else {
+  if ((isset($especie_id_busqueda)) && (is_numeric($especie_id_busqueda)) && ($especie_id_busqueda > 0)) {
+    $busqueda .= "especie una /";
+  } else {
+    $busqueda .= "especie todas /";
+  }
+
+  if (!empty($user_latlng) && (strlen($user_latlng) > 1)) {
+    $arr_user_latlng = explode(" ", $user_latlng);
+    $user_lat = $arr_user_latlng[0];
+    $user_lng = $arr_user_latlng[1];
+
+    if (is_numeric($user_lat) && is_numeric($user_lng)) {
+      $busqueda .= " donde marker /";
+    } else {
+      $busqueda .= " donde ciudad /";
+    }
+  } else {
+    $busqueda .= " donde ciudad /";
+  }
+
+  if ($busqueda == "especie todas / donde ciudad /") {
+    $busqueda = "";
+  }
+
+  if ((isset($user_sabores)) && (is_numeric($user_sabores)) && ($user_sabores > 0)) {
+    $busqueda .= " con sabores /";
+  }
+
+  if ($user_origen !== 'Todas') {
+    $busqueda .= " con origen ".$user_origen." /";
+  }
+
+  if ($borigen_pampeana > 0) {
+    $busqueda .= " con pampeana ".$borigen_pampeana." /";
+  }
+
+  if ($borigen_nea > 0) {
+    $busqueda .= " con nea ".$borigen_nea." /";
+  }
+
+  if ($borigen_noa > 0) {
+    $busqueda .= " con noa ".$borigen_noa." /";
+  }
+
+  if ($borigen_cuyana > 0) {
+    $busqueda .= " con cuyana ".$borigen_cuyana." /";
+  }
+
+  if ($borigen_patagonica > 0) {
+    $busqueda .= " con patagonica ".$borigen_patagonica." /";
+  }
+
+  if (isset($arbol_id) && ($arbol_id > 0)) {
+    $busqueda = " un arbol";
+  }
+
+  if (((isset($user_sabores)) && (is_numeric($user_sabores)) && ($user_sabores > 0)) ||
+    ($user_origen !== 'Todas') ||
+    ($borigen_pampeana > 0) ||
+    ($borigen_nea > 0) ||
+    ($borigen_noa > 0) ||
+    ($borigen_cuyana > 0) ||
+    ($borigen_patagonica > 0)
+  ) {
+    $masFiltrosCss = "visible";
+  }
+}
+?>
+
 <form action="<?php echo $APP_URL; ?>/index.php#mapa" method="post" id="busca_arboles">
   <div class="row">
     <div class="col-xs-12">

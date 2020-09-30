@@ -56,9 +56,204 @@ function onMarkerClick(e) {
   var oMarkerId = this.arbolId;
 
   $.ajax({
-    url: '/custom/scripts/arbol.php?id=' + oMarkerId,
-    success: function(datos){
-      $('#info-arbol').html(datos);
+    url: 'http://localhost:8080/arboles/' + oMarkerId,
+    success: function(arbol) {
+      var fecha = new Date(arbol.fecha_creacion);
+      fecha = fecha.getDate() + '/' + fecha.getMonth() + '/' + fecha.getFullYear();
+
+      var $detallesArbol = $('<p>').append(
+        arbol.tipo,
+        $('<br>'),
+        'Familia: ' + arbol.familia,
+        $('<br>'),
+        'Origen: ' + arbol.origen
+      );
+
+      if (arbol.procedencia_exotica) {
+        $detallesArbol.append(
+          $('<br>'),
+          'Procedencia: ' + arbol.procedencia_exotica
+        );
+      }
+
+      if (arbol.region_nea || arbol.region_noa || arbol.region_cuyana || arbol.region_pampeana || arbol.region_patagonica) {
+        $detallesArbol.append(
+          $('<br>'),
+          'Región de origen: '
+        );
+
+        var cantidadRegiones = 0;
+        if (arbol.region_pampeana) {
+          $detallesArbol.append('Pampeana');
+          cantidadRegiones++;
+        }
+
+        if (arbol.region_nea) {
+          if (cantidadRegiones > 0) {
+            $detallesArbol.append('/');
+          }
+
+          $detallesArbol.append('NEA');
+        }
+
+        if (arbol.region_noa) {
+          if (cantidadRegiones > 0) {
+            $detallesArbol.append('/');
+          }
+
+          $detallesArbol.append('NOA');
+        }
+
+        if (arbol.region_cuyana) {
+          if (cantidadRegiones > 0) {
+            $detallesArbol.append('/');
+          }
+
+          $detallesArbol.append('Cuyana');
+        }
+
+        if (arbol.region_patagonica) {
+          if (cantidadRegiones > 0) {
+            $detallesArbol.append('/');
+          }
+
+          $detallesArbol.append('Patagónica');
+        }
+      }
+
+      if (arbol.altura) {
+        $detallesArbol.append(
+          $('<br>'),
+          'Altura: ' + arbol.altura + ' m'
+        );
+      }
+
+      var $ubicacion = $('<p>').append(
+        $('<i>', { class: 'fa fa-map-marker fa-fw' })
+      );
+
+      if (arbol.espacio_verde) {
+        $ubicacion.append('Espacio Verde: ' + arbol.espacio_verde);
+      } else {
+        if (arbol.calle_altura == 0) {
+          arbol.calle_altura = 's/n';
+        }
+
+        $ubicacion.append(arbol.calle + ' ' + arbol.calle_altura);
+      }
+
+      var $enalces = [];
+
+      if (arbol.url) {
+        $enalces.push(
+          $('<a>', { target: '_blank', 'href': arbol.url }).append(
+            $('<span>', { class: 'fa-stack fa-lg' }).append(
+              $('<i>', { class: 'fa fa-circle fa-stack-2x' }),
+              $('<i>', { class: 'fa fa-link fa-stack-1x fa-inverse' }),
+            )
+          )
+        );
+      }
+
+      if (arbol.facebook) {
+        $enalces.push(
+          $('<a>', { target: '_blank', 'href': arbol.facebook }).append(
+            $('<span>', { class: 'fa-stack fa-lg' }).append(
+              $('<i>', { class: 'fa fa-circle fa-stack-2x' }),
+              $('<i>', { class: 'fa fa-facebook fa-stack-1x fa-inverse' }),
+            )
+          )
+        );
+      }
+
+      if (arbol.instagram) {
+        $enalces.push(
+          $('<a>', { target: '_blank', 'href': arbol.instagram }).append(
+            $('<span>', { class: 'fa-stack fa-lg' }).append(
+              $('<i>', { class: 'fa fa-circle fa-stack-2x' }),
+              $('<i>', { class: 'fa fa-instagram fa-stack-1x fa-inverse' }),
+            )
+          )
+        );
+      }
+
+      if (arbol.twitter) {
+        $enalces.push(
+          $('<a>', { target: '_blank', 'href': arbol.twitter }).append(
+            $('<span>', { class: 'fa-stack fa-lg' }).append(
+              $('<i>', { class: 'fa fa-circle fa-stack-2x' }),
+              $('<i>', { class: 'fa fa-twitter fa-stack-1x fa-inverse' }),
+            )
+          )
+        );
+      }
+
+      var $iframe = $('<iframe>', {
+        width: 100,
+        height: 400,
+        frameborder: 0,
+        allowfullscreen: true,
+        style: 'width: 100%; height: 400px',
+        src: arbol.streetview ? arbol.streetview : 'https://www.google.com/maps/embed/v1/streetview?key=AIzaSyDfB7v0px8LqJ3UXBP4yNZ374KQZVEAZ-Y&location=' + arbol.lat + ',' + arbol.lng + '&heading=210&pitch=10&fov=35',
+      });
+
+      var $fichaArbol = $('<div>', { class: 'box' }).append(
+        $('<a>', { href: '#', class: 'cerrar' }).append(
+          'cerrar',
+          $('<i>', { class: 'fa fa-times' })
+        ),
+        $('<h1>').append(
+          arbol.nombre_cientifico,
+          $('<br>'),
+          $('<small>').append(arbol.nombre_comun)
+        ),
+        $detallesArbol,
+        $ubicacion,
+        $('<div>', { class: 'autor panel panel-primary' }).append(
+          $('<div>', { class: 'panel-heading' }).append(
+            $('<h4>').append('Fuentes')
+          ),
+          $('<div>', { class: 'panel-body' }).append(
+            $('<p>').append(
+              'Dato aportado por ',
+              $('<strong>').append(arbol.nombre)
+            ),
+            $('<p>').append(
+              $('<small>').append(
+                fecha,
+                $('<br>'),
+                arbol.descripcion
+              )
+            ),
+            $enalces
+          )
+        ),
+        $('<div>', { class: 'panel panel-default' }).append($iframe),
+        $('<div>', { class: 'autor panel panel-default' }).append(
+          $('<div>', { class: 'panel-heading' }).append(
+            $('<h4>').append('Este árbol')
+          ),
+          $('<div>', { class: 'panel-body' }).append(
+            $('<p>').append(
+              'El siguiente código sirve para identificar a este árbol: ',
+              $('<kbd>').append(arbol.id),
+              $('<a>', { target: '_blank', href: '/arbol_id=' + arbol.id }).append( // TODO: URL completa al árbol
+                $('<i>', { class: 'fa fa-external-link' })
+              )
+            ),
+            $('<p>').append(
+              'Podés usarlo para reportar datos incorrectos enviando el código con los comentarios que quieras hacer por medio de ',
+              $('<a>', { class: 'text-primary', target: '_blank', href: 'https://www.facebook.com/arboladomapa/' }).append(
+                $('<i>', { class: 'fa fa-facebook-square' }),
+                '/arboladomapa',
+                $('<br>'),
+              ),
+              '¡Gracias!'
+            )
+          )
+        )
+      );
+      $('#info-arbol').html($fichaArbol);
       $('#info-arbol').slideDown();
       $('.cerrar').click(function (event) {
         event.preventDefault();
@@ -77,27 +272,24 @@ function getArboles() {
     data: $form.serialize(),
     success: function(arboles) {
       $('#empieza-busqueda').modal('hide');
-      for (var arbol of arboles) {
-        var marker_icon = new LeafIcon({ iconUrl: '/uploads/' + arbol.icono });
-        var marker = L.marker([arbol.lat, arbol.lng], { icon: marker_icon }).on('click', onMarkerClick);
-        marker.arbolId = arbol.id;
-        markerList.push(marker);
+      if (arboles.length > 0) {
+        for (var arbol of arboles) {
+          var marker_icon = new LeafIcon({ iconUrl: '/uploads/' + (arbol.icono ? arbol.icono : 'marker.png') });
+          var marker = L.marker([arbol.lat, arbol.lng], { icon: marker_icon }).on('click', onMarkerClick);
+          marker.arbolId = arbol.id;
+          markerList.push(marker);
+        }
+        markers.addLayers(markerList);
+        // Agrego el layer al mapa
+        window.map.addLayer(markers);
+        // Centro el mapa.
+        window.map.fitBounds(markers.getBounds());
+      } else {
+        $('#sin-resultados').modal('show');
       }
-      markers.addLayers(markerList);
-      // Agrego el layer al mapa
-      window.map.addLayer(markers);
-      // Centro el mapa.
-      window.map.fitBounds(markers.getBounds());
     },
   });
 }
-
-$('#busca_arboles').on('submit', function(event) {
-  event.preventDefault();
-  if (validarBusqueda()) {
-    getArboles();
-  }
-});
 
 function getEspecies() {
   $.ajax({
@@ -301,6 +493,13 @@ $(document).ready(function() {
   /********************************************************************************* FUNCIONES */
   // Cargar listado de especies
   getEspecies();
+
+  $('#busca_arboles').on('submit', function(event) {
+    event.preventDefault();
+    if (validarBusqueda()) {
+      getArboles();
+    }
+  });
 
 
   /********************************************************************************* INTERACCIONES */

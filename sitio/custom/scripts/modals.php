@@ -214,35 +214,33 @@
   </div>
 </div>
 
-<?php if ((isset($total_registros_censo))  &&  ($total_registros_censo === 0)) : ?>
-  <!-- Modal: sin resultados -->
-  <div class="modal fade" id="sin-resultados" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-      <div class="modal-content">
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-sm-2">
-              <i class="fa fa-search fa-3x"></i>
-            </div>
-            <div class="col-sm-10">
-              <p>
-                Tu búsqueda no arrojó resultados.
-              </p>
-              <p>
-                <small>
-                  Probá buscando la especie que te interesa en toda la ciudad, o
-                  cambiando la zona de búsqueda marcando otro lugar en el mapa.
-                </small>
-              </p>
-            </div>
+<!-- Modal: sin resultados -->
+<div class="modal fade" id="sin-resultados" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-2">
+            <i class="fa fa-search fa-3x"></i>
+          </div>
+          <div class="col-sm-10">
+            <p>
+              Tu búsqueda no arrojó resultados.
+            </p>
+            <p>
+              <small>
+                Probá buscando la especie que te interesa en toda la ciudad, o
+                cambiando la zona de búsqueda marcando otro lugar en el mapa.
+              </small>
+            </p>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">
-            Cerrar
-          </button>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Cerrar
+        </button>
       </div>
     </div>
   </div>
-<?php endif; ?>
+</div>

@@ -81,13 +81,15 @@ $descripcion .= ' esperando que colabore con el conocimiento y el cuidado de nue
     <script src="<?php echo $APP_URL; ?>/third-party/leaflet-plugins/CanvasOverlay/L.CanvasOverlay.js"></script>
     <script src="<?php echo $APP_URL; ?>/third-party/leaflet-plugins/EasyButton/easy-button.js"></script>
 
+    <!-- Custom js -->
+    <script type="text/javascript" src="<?php echo $APP_URL; ?>/custom/scripts/interaccion-form-mapa.js"></script>
+
     <!-- Font Awesome -->
     <script src="https://use.fontawesome.com/10e53b9570.js"></script>
 
     <!-- Custom -->
     <link href="<?php echo $APP_URL; ?>/custom/css/estilos.css" rel="stylesheet" type="text/css" media="all">
 
-    <?php require_once('custom/scripts/arboles.php'); ?>
   </head>
 
   <body>
@@ -230,7 +232,6 @@ $descripcion .= ' esperando que colabore con el conocimiento y el cuidado de nue
     </div>
 
     <?php require_once('custom/scripts/modals.php') ?>
-    <script type="text/javascript" src="<?php echo $APP_URL; ?>/custom/scripts/interaccion-form-mapa.js"></script>
     <?php require_once('custom/scripts/pintar-mapa.php') ?>
     <?php require_once('custom/scripts/funciones-js-footer.php') ?>
   </body>
